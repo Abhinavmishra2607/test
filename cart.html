@@ -1,7 +1,8 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shopping Cart - Gupta Provisions</title>
   <link rel="stylesheet" href="t4c.css">
   <style>
@@ -54,6 +55,43 @@
     .clear-cart-btn:hover {
       background-color: #ff4500;
     }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .responsive-table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+      }
+      .responsive-table table {
+        width: 100%;
+        border: none;
+      }
+      .responsive-table th, .responsive-table td {
+        display: block;
+        width: 100%;
+        text-align: right;
+      }
+      .responsive-table th {
+        background-color: transparent;
+        border-bottom: 2px solid #ddd;
+      }
+      .responsive-table td {
+        border: 1px solid #ddd;
+        border-top: none;
+        position: relative;
+        padding-left: 50%;
+        text-align: left;
+      }
+      .responsive-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+    }
   </style>
 </head>
 <body>
@@ -64,19 +102,21 @@
   </header>
 
   <section class="section">
-    <table>
-      <thead>
-        <tr>
-          <th>Serial No.</th>
-          <th>Product Name</th>
-          <th>Price (₹)</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="cart-items">
-        <!-- Cart items will be added dynamically here -->
-      </tbody>
-    </table>
+    <div class="responsive-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Serial No.</th>
+            <th>Product Name</th>
+            <th>Price (₹)</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="cart-items">
+          <!-- Cart items will be added dynamically here -->
+        </tbody>
+      </table>
+    </div>
 
     <!-- Only show this if the cart has items -->
     <div id="total-section" class="total" style="display: none;">
@@ -117,171 +157,6 @@
       cart.forEach((item, index) => {
         cartItemsHtml += `
           <tr data-index="${index}">
-            <td>${index + 1}</td>
-            <td>${item.name}</td>
-            <td>${item.price}</td>
-            <td><button class="remove-btn" data-id="${index}">Remove</button></td>
-          </tr>
-        `;
-        totalPrice += item.price;
-      });
-
-      document.<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Shopping Cart - Gupta Provisions</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="t4c.css">
-  <style>
-    /* Table Styling */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      padding: 12px;
-      text-align: left;
-      border: 1px solid #ddd;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-
-    .total, .delivery-fee {
-      text-align: right;
-      font-weight: bold;
-      margin-top: 20px;
-    }
-
-    .cart-button {
-      background-color: green;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      cursor: pointer;
-      margin-top: 20px;
-    }
-    .cart-button:hover {
-      background-color: darkgreen;
-    }
-
-    .remove-btn {
-      background-color: red;
-      color: white;
-      padding: 5px 10px;
-      border: none;
-      cursor: pointer;
-    }
-    .remove-btn:hover {
-      background-color: darkred;
-    }
-
-    .clear-cart-btn {
-      background-color: #ff6347;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      cursor: pointer;
-      margin-top: 20px;
-    }
-    .clear-cart-btn:hover {
-      background-color: #ff4500;
-    }
-
-    /* Responsive Styles */
-    @media (max-width: 600px) {
-      table, thead, tbody, th, td, tr {
-        display: block;
-        width: 100%;
-      }
-
-      thead {
-        display: none;
-      }
-
-      tr {
-        margin-bottom: 15px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 10px;
-        background-color: white;
-      }
-
-      td {
-        text-align: right;
-        padding-left: 50%;
-        position: relative;
-      }
-
-      td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 15px;
-        width: 45%;
-        padding-right: 10px;
-        white-space: nowrap;
-        font-weight: bold;
-        text-align: left;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <header class="header">
-    Your Cart
-  </header>
-
-  <section class="section">
-    <table>
-      <thead>
-        <tr>
-          <th>Serial No.</th>
-          <th>Product Name</th>
-          <th>Price (₹)</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="cart-items">
-        <!-- Cart items will appear here -->
-      </tbody>
-    </table>
-
-    <div id="total-section" class="total" style="display: none;">
-      <p>Delivery Fee: ₹20</p>
-      <p>Total: ₹<span id="total-price">0</span></p>
-    </div>
-
-    <div id="whatsapp-section" style="display: none;">
-      <button class="cart-button" id="send-to-whatsapp">Send to WhatsApp</button>
-    </div>
-
-    <button class="clear-cart-btn" id="clear-cart">Clear Cart</button>
-  </section>
-
-  <footer class="footer">
-    <p><a href="t5.html" style="color:white;">← Back to Home</a></p>
-  </footer>
-
-  <script>
-    // Load cart
-    const loadCart = () => {
-      const cart = JSON.parse(localStorage.getItem('cart')) || [];
-      let cartItemsHtml = '';
-      let totalPrice = 0;
-
-      if (cart.length === 0) {
-        document.getElementById('total-section').style.display = 'none';
-        document.getElementById('whatsapp-section').style.display = 'none';
-      } else {
-        document.getElementById('total-section').style.display = 'block';
-        document.getElementById('whatsapp-section').style.display = 'block';
-      }
-
-      cart.forEach((item, index) => {
-        cartItemsHtml += `
-          <tr data-index="${index}">
             <td data-label="Serial No.">${index + 1}</td>
             <td data-label="Product Name">${item.name}</td>
             <td data-label="Price (₹)">${item.price}</td>
@@ -292,55 +167,29 @@
       });
 
       document.getElementById('cart-items').innerHTML = cartItemsHtml;
-      document.getElementById('total-price').innerText = totalPrice + 20; // Delivery fee
+      document.getElementById('total-price').innerText = totalPrice + 20; // Adding delivery fee
     };
 
+    // Remove a product from the cart
     const removeProduct = (index) => {
       let cart = JSON.parse(localStorage.getItem('cart')) || [];
-      cart.splice(index, 1);
+      cart.splice(index, 1); // Remove the item at the specified index
       localStorage.setItem('cart', JSON.stringify(cart));
-      loadCart();
+      loadCart(); // Re-load the cart after removal
     };
 
+    // Clear the entire cart
     const clearCart = () => {
       localStorage.removeItem('cart');
-      loadCart();
+      loadCart(); // Re-load the empty cart
     };
 
+    // Sending cart to WhatsApp with a specific number
     const sendToWhatsApp = () => {
       const cart = JSON.parse(localStorage.getItem('cart')) || [];
       let message = "my address:\nI'd like to order the following items:\n";
 
       cart.forEach(item => {
-        message += `${item.name} - ₹${item.price}\n`;
-      });
-
-      message += `\nDelivery Fee: ₹20\nTotal: ₹${parseInt(document.getElementById('total-price').innerText)}`;
-
-      const whatsappNumber = '9871828606';
-      const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappLink, '_blank');
-    };
-
-    document.getElementById('cart-items').addEventListener('click', (e) => {
-      if (e.target && e.target.classList.contains('remove-btn')) {
-        const index = e.target.getAttribute('data-id');
-        removeProduct(index);
-      }
-    });
-
-    document.getElementById('clear-cart').addEventListener('click', clearCart);
-    document.getElementById('send-to-whatsapp').addEventListener('click', sendToWhatsApp);
-
-    window.onload = loadCart;
-  </script>
-
-</body>
-</html>
-
-
-
-
-
-</body>
-</html>
+        message += `${item.name} -
+::contentReference[oaicite:13]{index=13}
+ 
