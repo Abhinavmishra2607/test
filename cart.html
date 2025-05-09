@@ -1,135 +1,144 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Shopping Cart - Gupta Provisions</title>
   <link rel="stylesheet" href="t4c.css">
   <style>
-    /* CSS for table styling */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #c5e4af;
+      padding-bottom: 80px;
+    }
+
+    .header {
+      background-color: #2d6a4f;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 2rem;
+    }
+
+    .section {
+      padding: 20px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
+      overflow-x: auto;
+      display: block;
     }
+
     th, td {
       padding: 12px;
       text-align: left;
       border: 1px solid #ddd;
+      white-space: nowrap;
     }
+
     th {
       background-color: #f2f2f2;
     }
-    .total, .delivery-fee {
+
+    .total {
       text-align: right;
       font-weight: bold;
+      margin-top: 20px;
     }
-    .cart-button {
+
+    .cart-button, .clear-cart-btn {
       background-color: green;
       color: white;
       padding: 10px 15px;
       border: none;
       cursor: pointer;
       margin-top: 20px;
+      font-size: 1rem;
+      border-radius: 5px;
     }
+
     .cart-button:hover {
       background-color: darkgreen;
     }
+
+    .clear-cart-btn {
+      background-color: #ff6347;
+    }
+
+    .clear-cart-btn:hover {
+      background-color: #ff4500;
+    }
+
     .remove-btn {
       background-color: red;
       color: white;
       padding: 5px 10px;
       border: none;
       cursor: pointer;
+      border-radius: 5px;
     }
+
     .remove-btn:hover {
       background-color: darkred;
     }
-    .clear-cart-btn {
-      background-color: #ff6347;
+
+    .footer {
+      background-color: #2d6a4f;
       color: white;
-      padding: 10px 15px;
-      border: none;
-      cursor: pointer;
-      margin-top: 20px;
-    }
-    .clear-cart-btn:hover {
-      background-color: #ff4500;
+      text-align: center;
+      padding: 20px;
     }
 
-    /* Responsive Design */
     @media (max-width: 600px) {
-      .responsive-table {
-        display: block;
+      th, td {
+        font-size: 14px;
+        padding: 10px;
+      }
+
+      .cart-button, .clear-cart-btn {
         width: 100%;
-        overflow-x: auto;
+        padding: 12px;
+        font-size: 1rem;
       }
-      .responsive-table table {
-        width: 100%;
-        border: none;
-      }
-      .responsive-table th, .responsive-table td {
-        display: block;
-        width: 100%;
-        text-align: right;
-      }
-      .responsive-table th {
-        background-color: transparent;
-        border-bottom: 2px solid #ddd;
-      }
-      .responsive-table td {
-        border: 1px solid #ddd;
-        border-top: none;
-        position: relative;
-        padding-left: 50%;
-        text-align: left;
-      }
-      .responsive-table td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 10px;
-        top: 10px;
-        font-weight: bold;
-        text-transform: uppercase;
+
+      .remove-btn {
+        padding: 6px 8px;
+        font-size: 14px;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header class="header">
-    Your Cart
-  </header>
+  <header class="header">Your Cart</header>
 
   <section class="section">
-    <div class="responsive-table">
-      <table>
-        <thead>
-          <tr>
-            <th>Serial No.</th>
-            <th>Product Name</th>
-            <th>Price (₹)</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="cart-items">
-          <!-- Cart items will be added dynamically here -->
-        </tbody>
-      </table>
-    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Serial No.</th>
+          <th>Product Name</th>
+          <th>Price (₹)</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="cart-items">
+        <!-- Items injected by JS -->
+      </tbody>
+    </table>
 
-    <!-- Only show this if the cart has items -->
     <div id="total-section" class="total" style="display: none;">
       <p>Delivery Fee: ₹20</p>
       <p>Total: ₹<span id="total-price">0</span></p>
     </div>
 
-    <!-- Only show this if the cart has items -->
     <div id="whatsapp-section" style="display: none;">
       <button class="cart-button" id="send-to-whatsapp">Send to WhatsApp</button>
     </div>
 
-    <!-- Clear cart button always visible -->
     <button class="clear-cart-btn" id="clear-cart">Clear Cart</button>
   </section>
 
@@ -138,58 +147,76 @@
   </footer>
 
   <script>
-    // Load cart items from localStorage
-    const loadCart = () => {
+    function loadCart() {
       const cart = JSON.parse(localStorage.getItem('cart')) || [];
-      let cartItemsHtml = '';
-      let totalPrice = 0;
+      const cartItems = document.getElementById('cart-items');
+      const totalPriceEl = document.getElementById('total-price');
+      let cartHtml = '';
+      let total = 0;
 
-      // If cart is empty, hide the delivery and WhatsApp sections
       if (cart.length === 0) {
         document.getElementById('total-section').style.display = 'none';
         document.getElementById('whatsapp-section').style.display = 'none';
       } else {
-        // Otherwise, show them
         document.getElementById('total-section').style.display = 'block';
         document.getElementById('whatsapp-section').style.display = 'block';
       }
 
       cart.forEach((item, index) => {
-        cartItemsHtml += `
+        total += item.price;
+        cartHtml += `
           <tr data-index="${index}">
-            <td data-label="Serial No.">${index + 1}</td>
-            <td data-label="Product Name">${item.name}</td>
-            <td data-label="Price (₹)">${item.price}</td>
-            <td data-label="Action"><button class="remove-btn" data-id="${index}">Remove</button></td>
+            <td>${index + 1}</td>
+            <td>${item.name}</td>
+            <td>₹${item.price}</td>
+            <td><button class="remove-btn" data-id="${index}">Remove</button></td>
           </tr>
         `;
-        totalPrice += item.price;
       });
 
-      document.getElementById('cart-items').innerHTML = cartItemsHtml;
-      document.getElementById('total-price').innerText = totalPrice + 20; // Adding delivery fee
-    };
+      cartItems.innerHTML = cartHtml;
+      totalPriceEl.textContent = total + 20;
+    }
 
-    // Remove a product from the cart
-    const removeProduct = (index) => {
+    function removeProduct(index) {
       let cart = JSON.parse(localStorage.getItem('cart')) || [];
-      cart.splice(index, 1); // Remove the item at the specified index
+      cart.splice(index, 1);
       localStorage.setItem('cart', JSON.stringify(cart));
-      loadCart(); // Re-load the cart after removal
-    };
+      loadCart();
+    }
 
-    // Clear the entire cart
-    const clearCart = () => {
+    function clearCart() {
       localStorage.removeItem('cart');
-      loadCart(); // Re-load the empty cart
-    };
+      loadCart();
+    }
 
-    // Sending cart to WhatsApp with a specific number
-    const sendToWhatsApp = () => {
+    function sendToWhatsApp() {
       const cart = JSON.parse(localStorage.getItem('cart')) || [];
       let message = "my address:\nI'd like to order the following items:\n";
+      let total = 0;
 
       cart.forEach(item => {
-        message += `${item.name} -
-::contentReference[oaicite:13]{index=13}
- 
+        message += `${item.name} - ₹${item.price}\n`;
+        total += item.price;
+      });
+
+      message += `\nDelivery Fee: ₹20\nTotal: ₹${total + 20}`;
+      const whatsappNumber = '9871828606';
+      const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappLink, '_blank');
+    }
+
+    document.getElementById('cart-items').addEventListener('click', function(e) {
+      if (e.target.classList.contains('remove-btn')) {
+        const index = e.target.getAttribute('data-id');
+        removeProduct(index);
+      }
+    });
+
+    document.getElementById('clear-cart').addEventListener('click', clearCart);
+    document.getElementById('send-to-whatsapp').addEventListener('click', sendToWhatsApp);
+
+    window.onload = loadCart;
+  </script>
+</body>
+</html>
