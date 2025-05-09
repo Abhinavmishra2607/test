@@ -25,11 +25,15 @@
       padding: 20px;
     }
 
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      overflow-x: auto;
-      display: block;
+      min-width: 600px;
     }
 
     th, td {
@@ -108,6 +112,10 @@
         padding: 6px 8px;
         font-size: 14px;
       }
+
+      table {
+        min-width: unset;
+      }
     }
   </style>
 </head>
@@ -116,19 +124,21 @@
   <header class="header">Your Cart</header>
 
   <section class="section">
-    <table>
-      <thead>
-        <tr>
-          <th>Serial No.</th>
-          <th>Product Name</th>
-          <th>Price (₹)</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="cart-items">
-        <!-- Items injected by JS -->
-      </tbody>
-    </table>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Serial No.</th>
+            <th>Product Name</th>
+            <th>Price (₹)</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="cart-items">
+          <!-- Items injected by JS -->
+        </tbody>
+      </table>
+    </div>
 
     <div id="total-section" class="total" style="display: none;">
       <p>Delivery Fee: ₹20</p>
@@ -147,18 +157,15 @@
   </footer>
 
   <script>
-    // Load cart items from localStorage
     const loadCart = () => {
       const cart = JSON.parse(localStorage.getItem('cart')) || [];
       let cartItemsHtml = '';
       let totalPrice = 0;
 
-      // If cart is empty, hide the delivery and WhatsApp sections
       if (cart.length === 0) {
         document.getElementById('total-section').style.display = 'none';
         document.getElementById('whatsapp-section').style.display = 'none';
       } else {
-        // Otherwise, show them
         document.getElementById('total-section').style.display = 'block';
         document.getElementById('whatsapp-section').style.display = 'block';
       }
@@ -176,24 +183,21 @@
       });
 
       document.getElementById('cart-items').innerHTML = cartItemsHtml;
-      document.getElementById('total-price').innerText = totalPrice + 20; // Adding delivery fee
+      document.getElementById('total-price').innerText = totalPrice + 20;
     };
 
-    // Remove a product from the cart
     const removeProduct = (index) => {
       let cart = JSON.parse(localStorage.getItem('cart')) || [];
-      cart.splice(index, 1); // Remove the item at the specified index
+      cart.splice(index, 1);
       localStorage.setItem('cart', JSON.stringify(cart));
-      loadCart(); // Re-load the cart after removal
+      loadCart();
     };
 
-    // Clear the entire cart
     const clearCart = () => {
       localStorage.removeItem('cart');
-      loadCart(); // Re-load the empty cart
+      loadCart();
     };
 
-    // Sending cart to WhatsApp with a specific number
     const sendToWhatsApp = () => {
       const cart = JSON.parse(localStorage.getItem('cart')) || [];
       let message = "my address:\nI'd like to order the following items:\n";
@@ -203,13 +207,11 @@
       });
 
       message += `\nDelivery Fee: ₹20\nTotal: ₹${parseInt(document.getElementById('total-price').innerText)}`;
-
-      const whatsappNumber = '9871828606';  // Your specific WhatsApp number
-      const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message) }`;
+      const whatsappNumber = '9871828606';
+      const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
       window.open(whatsappLink, '_blank');
     };
 
-    // Event listener for removing a product
     document.getElementById('cart-items').addEventListener('click', (e) => {
       if (e.target && e.target.classList.contains('remove-btn')) {
         const index = e.target.getAttribute('data-id');
@@ -217,14 +219,10 @@
       }
     });
 
-    // Event listener for clearing the cart
     document.getElementById('clear-cart').addEventListener('click', clearCart);
-
-    // Event listener for sending to WhatsApp
     document.getElementById('send-to-whatsapp').addEventListener('click', sendToWhatsApp);
-
-    // Initialize cart page
     window.onload = loadCart;
   </script>
+
 </body>
 </html>
