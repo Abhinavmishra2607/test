@@ -147,75 +147,83 @@
   </footer>
 
   <script>
-    function loadCart() {
+    // Load cart items from localStorage
+    const loadCart = () => {
       const cart = JSON.parse(localStorage.getItem('cart')) || [];
-      const cartItems = document.getElementById('cart-items');
-      const totalPriceEl = document.getElementById('total-price');
-      let cartHtml = '';
-      let total = 0;
+      let cartItemsHtml = '';
+      let totalPrice = 0;
 
+      // If cart is empty, hide the delivery and WhatsApp sections
       if (cart.length === 0) {
         document.getElementById('total-section').style.display = 'none';
         document.getElementById('whatsapp-section').style.display = 'none';
       } else {
+        // Otherwise, show them
         document.getElementById('total-section').style.display = 'block';
         document.getElementById('whatsapp-section').style.display = 'block';
       }
 
       cart.forEach((item, index) => {
-        total += item.price;
-        cartHtml += `
+        cartItemsHtml += `
           <tr data-index="${index}">
             <td>${index + 1}</td>
             <td>${item.name}</td>
-            <td>₹${item.price}</td>
+            <td>${item.price}</td>
             <td><button class="remove-btn" data-id="${index}">Remove</button></td>
           </tr>
         `;
+        totalPrice += item.price;
       });
 
-      cartItems.innerHTML = cartHtml;
-      totalPriceEl.textContent = total + 20;
-    }
+      document.getElementById('cart-items').innerHTML = cartItemsHtml;
+      document.getElementById('total-price').innerText = totalPrice + 20; // Adding delivery fee
+    };
 
-    function removeProduct(index) {
+    // Remove a product from the cart
+    const removeProduct = (index) => {
       let cart = JSON.parse(localStorage.getItem('cart')) || [];
-      cart.splice(index, 1);
+      cart.splice(index, 1); // Remove the item at the specified index
       localStorage.setItem('cart', JSON.stringify(cart));
-      loadCart();
-    }
+      loadCart(); // Re-load the cart after removal
+    };
 
-    function clearCart() {
+    // Clear the entire cart
+    const clearCart = () => {
       localStorage.removeItem('cart');
-      loadCart();
-    }
+      loadCart(); // Re-load the empty cart
+    };
 
-    function sendToWhatsApp() {
+    // Sending cart to WhatsApp with a specific number
+    const sendToWhatsApp = () => {
       const cart = JSON.parse(localStorage.getItem('cart')) || [];
       let message = "my address:\nI'd like to order the following items:\n";
-      let total = 0;
 
       cart.forEach(item => {
         message += `${item.name} - ₹${item.price}\n`;
-        total += item.price;
       });
 
-      message += `\nDelivery Fee: ₹20\nTotal: ₹${total + 20}`;
-      const whatsappNumber = '9871828606';
-      const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappLink, '_blank');
-    }
+      message += `\nDelivery Fee: ₹20\nTotal: ₹${parseInt(document.getElementById('total-price').innerText)}`;
 
-    document.getElementById('cart-items').addEventListener('click', function(e) {
-      if (e.target.classList.contains('remove-btn')) {
+      const whatsappNumber = '9871828606';  // Your specific WhatsApp number
+      const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message) }`;
+      window.open(whatsappLink, '_blank');
+    };
+
+    // Event listener for removing a product
+    document.getElementById('cart-items').addEventListener('click', (e) => {
+      if (e.target && e.target.classList.contains('remove-btn')) {
         const index = e.target.getAttribute('data-id');
         removeProduct(index);
       }
     });
 
+    // Event listener for clearing the cart
     document.getElementById('clear-cart').addEventListener('click', clearCart);
+
+    // Event listener for sending to WhatsApp
     document.getElementById('send-to-whatsapp').addEventListener('click', sendToWhatsApp);
 
+    // Initialize cart page
     window.onload = loadCart;
   </script>
 </body>
