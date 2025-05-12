@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard - Gupta Provisions</title>
+  <!-- Reuse existing CSS for styling consistency -->
+  <link rel="stylesheet" href="t4c.css">
+  <style>
+    /* Additional admin-specific styles */
+    .admin-section { 
+      margin: 20px; padding: 10px; border: 1px solid #ccc; 
+      border-radius: 8px; background: #f9f9f9;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background-color: #2d6a4f; color: white; }
+    .form-control { margin: 5px 0; }
+    .form-control input, .form-control select { 
+      width: 100%; padding: 6px; margin-top: 4px;
+      box-sizing: border-box;
+    }
+    .btn { 
+      padding: 8px 16px; background-color: #2d6a4f; 
+      color: white; border: none; border-radius: 4px; 
+      cursor: pointer; margin-top: 8px;
+    }
+    .btn:hover { background-color: #22543d; }
+    .chart-container { width: 400px; margin: 20px auto; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">Gupta Provisions Admin Dashboard</header>
+  <!-- Navigation within admin page -->
+  <nav class="category-bar">
+    <a href="#products" class="category-link">Manage Products</a>
+    <a href="#users" class="category-link">Manage Users</a>
+    <a href="#analytics" class="category-link">Analytics</a>
+  </nav>
+
+  <!-- ===== Manage Products Section ===== -->
+  <section id="products" class="admin-section section">
+    <h2>Product Management</h2>
+    <p>Add or remove products (in a real site, this would update the database).</p>
+    <!-- Form to add a new product -->
+    <form id="productForm">
+      <div class="form-control">
+        <label for="prodName">Product Name:</label>
+        <input type="text" id="prodName" required>
+      </div>
+      <div class="form-control">
+        <label for="prodPrice">Price:</label>
+        <input type="number" id="prodPrice" required>
+      </div>
+      <div class="form-control">
+        <label for="prodCategory">Category:</label>
+        <select id="prodCategory">
+          <option value="all">All</option>
+          <option value="sanitary">Sanitary</option>
+          <option value="beverages">Beverages</option>
+          <option value="snacks">Snacks</option>
+          <option value="essentials">Daily Essentials</option>
+          <option value="pooja">Pooja</option>
+          <option value="dairy">Dairy</option>
+          <option value="dry">Dry Fruits</option>
+        </select>
+      </div>
+      <button type="submit" class="btn">Add Product</button>
+    </form>
+    <p id="productMsg"></p>
+    <!-- Table listing current products -->
+    <table id="productTable">
+      <thead>
+        <tr><th>#</th><th>Name</th><th>Price</th><th>Category</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        <!-- Product rows will be injected here by JavaScript -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===== Manage Users Section ===== -->
+  <section id="users" class="admin-section section">
+    <h2>User Management</h2>
+    <p>Registered users (data from signup form). Use the buttons to remove a user.</p>
+    <table id="usersTable">
+      <thead>
+        <tr><th>#</th><th>Username</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        <!-- User rows will be injected here by JavaScript -->
+      </tbody>
+    </table>
+    <p id="userMsg"></p>
+  </section>
+
+  <!-- ===== Analytics Section ===== -->
+  <section id="analytics" class="admin-section section">
+    <h2>Site Analytics</h2>
+    <p>Basic analytics. In production, integrate Google Analytics or similar.</p>
+    <!-- Chart.js canvas for visits chart -->
+    <div class="chart-container">
+      <canvas id="visitsChart"></canvas>
+    </div>
+    <p>Total Registered Users: <span id="totalUsers">0</span></p>
+  </section>
+
+  <!-- Include Chart.js library from CDN for analytics chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // --------- Product Management Script ---------
+    const productForm = document.getElementById('productForm');
+    const productTableBody = document.querySelector('#productTable tbody');
+    // Load products from localStorage (simulate a data store)
+    let products = JSON.parse(localStorage.getItem('products')) || [];
+
+    // Function to refresh the product table UI
+    function refreshProductTable() {
+      productTableBody.innerHTML = '';
+      products.forEach((prod, idx) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${idx+1}</td>
+          <td>${prod.name}</td>
+          <td>${prod.price}</td>
+          <td>${prod.category}</td>
+          <td><button data-index="${idx}" class="btn remove-btn">Delete</button></td>
+        `;
+        productTableBody.appendChild(row);
+      });
+    }
+    // Handle form submission to add a new product
+    productForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('prodName').value.trim();
+      const price = parseFloat(document.getElementById('prodPrice').value);
+      const category = document.getElementById('prodCategory').value;
+      if (!name || !price) return;
+      products.push({name, price, category});
+      localStorage.setItem('products', JSON.stringify(products));
+      refreshProductTable();
+      productForm.reset();
+      document.getElementById('productMsg').textContent = 'Product added (refresh category pages to see changes).';
+    });
+    // Handle deletion of a product
+    productTableBody.addEventListener('click', (e) => {
+      if (e.target.classList.contains('remove-btn')) {
+        const index = e.target.dataset.index;
+        products.splice(index, 1);
+        localStorage.setItem('products', JSON.stringify(products));
+        refreshProductTable();
+      }
+    });
+
+    // --------- User Management Script ---------
+    const usersTableBody = document.querySelector('#usersTable tbody');
+    // Load users from localStorage (signed-up users)
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    function refreshUsersTable() {
+      usersTableBody.innerHTML = '';
+      users.forEach((user, idx) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${idx+1}</td>
+          <td>${user.username}</td>
+          <td><button data-index="${idx}" class="btn remove-btn">Delete</button></td>
+        `;
+        usersTableBody.appendChild(row);
+      });
+      document.getElementById('totalUsers').textContent = users.length;
+    }
+    // Handle deletion of a user
+    usersTableBody.addEventListener('click', (e) => {
+      if (e.target.classList.contains('remove-btn')) {
+        const index = e.target.dataset.index;
+        users.splice(index, 1);
+        localStorage.setItem('users', JSON.stringify(users));
+        refreshUsersTable();
+        document.getElementById('userMsg').textContent = 'User removed.';
+      }
+    });
+
+    // --------- Analytics Chart ---------
+    window.onload = () => {
+      refreshProductTable();
+      refreshUsersTable();
+
+      // Example: Create a line chart of site visits (dummy data)
+      const ctx = document.getElementById('visitsChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+          datasets: [{
+            label: 'Site Visits (last 7 days)',
+            data: [12, 19, 7, 15, 10, 5, 8],
+            borderColor: '#2d6a4f',
+            backgroundColor: 'rgba(45,106,79,0.2)',
+            fill: true
+          }]
+        },
+        options: {
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    };
+  </script>
+</body>
+</html>
