@@ -67,31 +67,35 @@
       </div>
       <button type="submit" class="btn">Add Product</button>
     </form>
-    <p id="productMsg"></p>
-    <!-- Table listing current products -->
-    <table id="productTable">
-      <thead>
-        <tr><th>#</th><th>Name</th><th>Price</th><th>Category</th><th>Action</th></tr>
-      </thead>
-      <tbody>
-        <!-- Product rows will be injected here by JavaScript -->
-      </tbody>
-    </table>
-  </section>
-
-  <!-- ===== Manage Users Section ===== -->
-  <section id="users" class="admin-section section">
-    <h2>User Management</h2>
-    <p>Registered users (data from signup form). Use the buttons to remove a user.</p>
-    <table id="usersTable">
-      <thead>
-        <tr><th>#</th><th>Username</th><th>Action</th></tr>
-      </thead>
-      <tbody>
-        <!-- User rows will be injected here by JavaScript -->
-      </tbody>
-    </table>
-    <p id="userMsg"></p>
+<form id="productForm">
+  <div class="form-control">
+    <label for="prodName">Product Name:</label>
+    <input type="text" id="prodName" required>
+  </div>
+  <div class="form-control">
+    <label for="prodPrice">Price:</label>
+    <input type="number" id="prodPrice" required>
+  </div>
+  <div class="form-control">
+    <label for="prodCategory">Category:</label>
+    <select id="prodCategory">
+      <option value="all">All</option>
+      <option value="sanitary">Sanitary</option>
+      <option value="beverages">Beverages</option>
+      <option value="snacks">Snacks</option>
+      <option value="essentials">Daily Essentials</option>
+      <option value="pooja">Pooja</option>
+      <option value="dairy">Dairy</option>
+      <option value="dry">Dry Fruits</option>
+    </select>
+  </div>
+  <div class="form-control">
+    <label for="prodImage">Product Image:</label>
+    <input type="file" id="prodImage" accept="image/*" required>
+  </div>
+  <button type="submit" class="btn">Add Product</button>
+</form>
+<p id="productMsg"></p>
   </section>
 
   <!-- ===== Analytics Section ===== -->
@@ -116,32 +120,23 @@
 
     // Function to refresh the product table UI
     function refreshProductTable() {
-      productTableBody.innerHTML = '';
-      products.forEach((prod, idx) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${idx+1}</td>
-          <td>${prod.name}</td>
-          <td>${prod.price}</td>
-          <td>${prod.category}</td>
-          <td><button data-index="${idx}" class="btn remove-btn">Delete</button></td>
-        `;
-        productTableBody.appendChild(row);
-      });
+  productTableBody.innerHTML = '';
+  products.forEach((prod, idx) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${idx + 1}</td>
+      <td>
+        <img src="${prod.image}" alt="Image" style="height:40px;width:auto;"><br>
+        ${prod.name}
+      </td>
+      <td>${prod.price}</td>
+      <td>${prod.category}</td>
+      <td><button data-index="${idx}" class="btn remove-btn">Delete</button></td>
+    `;
+    productTableBody.appendChild(row);
+  });
     }
-    // Handle form submission to add a new product
-    productForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('prodName').value.trim();
-      const price = parseFloat(document.getElementById('prodPrice').value);
-      const category = document.getElementById('prodCategory').value;
-      if (!name || !price) return;
-      products.push({name, price, category});
-      localStorage.setItem('products', JSON.stringify(products));
-      refreshProductTable();
-      productForm.reset();
-      document.getElementById('productMsg').textContent = 'Product added (refresh category pages to see changes).';
-    });
+
     // Handle deletion of a product
     productTableBody.addEventListener('click', (e) => {
       if (e.target.classList.contains('remove-btn')) {
@@ -151,7 +146,26 @@
         refreshProductTable();
       }
     });
+productForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const name = document.getElementById('prodName').value.trim();
+  const price = parseFloat(document.getElementById('prodPrice').value);
+  const category = document.getElementById('prodCategory').value;
+  const imageFile = document.getElementById('prodImage').files[0];
 
+  if (!name || !price || !imageFile) return;
+
+  const reader = new FileReader();
+  reader.onload = function () {
+    const imageData = reader.result; // base64 string
+    products.push({ name, price, category, image: imageData });
+    localStorage.setItem('products', JSON.stringify(products));
+    refreshProductTable();
+    productForm.reset();
+    document.getElementById('productMsg').textContent = 'Product added!';
+  };
+  reader.readAsDataURL(imageFile); // read image as base64
+});
     // --------- User Management Script ---------
     const usersTableBody = document.querySelector('#usersTable tbody');
     // Load users from localStorage (signed-up users)
